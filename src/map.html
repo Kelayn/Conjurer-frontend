@@ -977,3 +977,22 @@ function do_allotment(n = -1){
 </script>
 
 <input type="checkbox" onchange="do_allotment()" id="do_allotment">
+
+<div id = "auto_com">Автозаполнение</div>
+
+
+
+<input type = "checkbox" onchange = "do_allotment()" id = "do_allotment">
+
+<div name = "zones">
+	<div value = "0" onclick = "do_allotment(0)">Зона mаксимум</div>
+	<div value = "1" onclick = "do_allotment(1)">Зона более</div>
+	<div value = "2" onclick = "do_allotment(2)">Зона нормально</div>
+	<div value = "3" onclick = "do_allotment(3)">Обычная зона</div>
+
+<div name="zones">
+	<div value="0" onclick="do_allotment(0)">Зона максимум</div>
+	<div value="1" onclick="do_allotment(1)">Зона более</div>
+	<div value="2" onclick="do_allotment(2)">Зона нормально</div>
+	<div value="3" onclick="do_allotment(3)">Обычная зона</div>
+</div>
