@@ -146,6 +146,24 @@
 
 
 <script>
+// Лист изменений
+list_doing = [];
+
+function Change(type, params){
+    
+    this.type = type; // Название api метода
+    
+    this.params = params;
+    
+}
+
+
+
+
+
+
+
+
 
 /*
  * map - синглтон, объекты карты для размещения стеллажей
@@ -238,7 +256,7 @@ map = {
 						
 						item.innerHTML = "";
 						
-						let sh = map.selected;
+                        let sh = map.selected;
 						
 						//map.selected = null;
 						
@@ -247,7 +265,9 @@ map = {
 						
 						sh_item.classList.add("type_" + sh.type);
 						
-						// !!!!!!!!!!!! Этот объект хранит в себе список списков: 1 - список полок, 2 - список продуктов на каждой полке
+						// !!!!!!!!!!!! Этот объект хранит в себе список списков: 
+						// 1 - список полок,
+						// 2 - список продуктов на каждой полке
 						sh_item.shelfs = [];	//Список полок, изначально пустой
 						
 						
@@ -271,6 +291,14 @@ map = {
 							e.stopPropagation();
 							map.selected = null;
 							item.innerHTML = "";
+                            
+                            // Добавление действия
+                            list_doing.push(new Change("removeEntity", {
+                                projectId: map.id,
+                                x: item.x,
+                                y: item.y,
+                            }));
+                            
 						});
 						
 						
@@ -297,7 +325,19 @@ map = {
 						});
 						
 						
-						
+						// Добавление действия
+                        list_doing.push(new Change("addEntity", {
+                            projectId: map.id,
+                            x: item.x,
+                            y: item.y,
+                            w: 1,
+                            h: 1,
+                            d: 1,
+                            contents: null,
+                            group: item.zone
+                        }));
+                        
+                        
 						
 						sh_item.append(close);
 						
@@ -345,6 +385,7 @@ map = {
 		this.wrapper.append(this.block);
 	
 	},
+    
 	
 
 	
@@ -612,20 +653,41 @@ function do_allotment(n = -1){
 
 	if(n == -1){
 	
-	var doc = document.querySelector("#do_allotment");
-	
-	if(doc.checked){
-		map.selected = null;
-		cursor.allotment.doing = true;
-	}else{
-		cursor.allotment.doing = false;
-	}
-	return;
+        var doc = document.querySelector("#do_allotment");
+        
+        if(doc.checked){
+            map.selected = null;
+            cursor.allotment.doing = true;
+        }else{
+            cursor.allotment.doing = false;
+        }
+        return;
 	}
 	
 	cursor.allotment.zone = n*1;
 	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
 <input type = "checkbox" onchange = "do_allotment()" id = "do_allotment">
