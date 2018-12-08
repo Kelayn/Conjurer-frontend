@@ -1,6 +1,20 @@
+<head>
+	<title>Planning of your space</title>
+</head>
+
 <style>
 
-	.map_div{
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.global {
+	padding: 8px;
+}
+
+.map_div{
 	position: relative;
 }
 
@@ -224,739 +238,743 @@
 }
 </style>
 
-<div id="map_wrapper"></div>
+<body>
+	<div class="global">
+		<div id="map_wrapper"></div>
 
-<div id="shelfs_wrapper"></div>
+		<div id="shelfs_wrapper"></div>
 
-<div id="relate_products_wrapper"></div>
-
-
-<form id="ask_g">
-	<input id="ask_g_h" placeholder="Длина полки"><br>
-	<input id="ask_g_w" placeholder="Ширина полки"><br>
-	<input id="ask_g_d" placeholder="Глубина полки"><br>
-	<div id="ask_g_but">Добавить полку!</div>
-</form>
+		<div id="relate_products_wrapper"></div>
 
 
-<div id="products">
-
-	<select>
-		<option value="1">Молоко</option>
-		<option value="2">Мясо</option>
-		<option value="3">Винцо</option>
-		<option value="4">Хлеб</option>
-	</select>
-
-</div>
-
-<!--
-<div id="addItems">
-	<table>
-		<tr>
-			<td>
-				<p id="click" >sdsd</p>
-			</td>
-		</tr>
-
-		<tr>
-			<td>
-				тут будет список товаров заполненный из бд с помощью скрипта.
-			</td>
-		</tr>
-	</table>
-</div>
--->
-<script>
-
-	//Mouse pos
-/*
-document.querySelector("#click").addEventListener('click', function(e){
-	var add = document.querySelector("#addItems");
-	add.style.left = e.pageX + "px";
-	add.style.top = e.pageY + "px";
-
-});
-*/
-
-</script>
+		<form id="ask_g">
+			<input id="ask_g_h" placeholder="Длина полки"><br>
+			<input id="ask_g_w" placeholder="Ширина полки"><br>
+			<input id="ask_g_d" placeholder="Глубина полки"><br>
+			<div id="ask_g_but">Добавить полку!</div>
+		</form>
 
 
-<script>
+		<div id="products">
 
-	// Лист изменений
-list_doing = [];
+			<select>
+				<option value="1">Молоко</option>
+				<option value="2">Мясо</option>
+				<option value="3">Винцо</option>
+				<option value="4">Хлеб</option>
+			</select>
 
-function Change(type, params){
+		</div>
 
-    this.type = type; // Название api метода
+		<!--
+		<div id="addItems">
+			<table>
+				<tr>
+					<td>
+						<p id="click" >sdsd</p>
+					</td>
+				</tr>
 
-    this.params = params;
+				<tr>
+					<td>
+						тут будет список товаров заполненный из бд с помощью скрипта.
+					</td>
+				</tr>
+			</table>
+		</div>
+		-->
+		<script>
 
-}
+			//Mouse pos
+		/*
+		document.querySelector("#click").addEventListener('click', function(e){
+			var add = document.querySelector("#addItems");
+			add.style.left = e.pageX + "px";
+			add.style.top = e.pageY + "px";
+
+		});
+		*/
+
+		</script>
 
 
+		<script>
 
+			// Лист изменений
+		list_doing = [];
 
+		function Change(type, params){
+
+			this.type = type; // Название api метода
+
+			this.params = params;
+
+		}
 
 
 
 
 
-/*
- * map - синглтон, объекты карты для размещения стеллажей
- * и продуктов на стеллажай
- * pool - синглтон, пул объектов, которые могут размещаться на map
- *
- * map:
- *   items: двумерный массив ячеек карты
- *			хранит dom-элементы класса map_item,
- *			которые хранят dom-элементы sh_item,
- *			в которых хранится массив массивов продуктов
-*/
-
-map = {
-
-	width: 30,
-	height: 10,
-
-	size_item: 48,
-
-	items: [],
-
-	wrapper: null,
-	block: null,
-
-	selected: null,
-	pseudo_dragging: null,
-
-	init: function(selector){
-
-		// Получаем враппер
-		this.wrapper = document.querySelector(selector);
-		this.wrapper.style.width = this.size_item*this.width;
-		this.wrapper.style.height = this.size_item*this.height;
 
 
-		// Создаём контейнер с картой
-		this.block = document.createElement('div');
-		this.block.setAttribute('class', 'map_div');
-
-		this.block.style.width = this.size_item*this.width;
-		this.block.style.height = this.size_item*this.height;
 
 
-		for(let i = 0; i < this.height; i++){
+		/*
+		* map - синглтон, объекты карты для размещения стеллажей
+		* и продуктов на стеллажай
+		* pool - синглтон, пул объектов, которые могут размещаться на map
+		*
+		* map:
+		*   items: двумерный массив ячеек карты
+		*			хранит dom-элементы класса map_item,
+		*			которые хранят dom-элементы sh_item,
+		*			в которых хранится массив массивов продуктов
+		*/
 
-			this.items[i] = [];
+		map = {
 
-			for(let j = 0; j < this.width; j++){
+			width: 30,
+			height: 10,
 
-				let item = document.createElement('div');
+			size_item: 48,
 
-				// Коррекция для границ
-				let cor = "";
+			items: [],
 
-				if((i < this.height - 1) && (j < this.width - 1)){
-					cor += " border-r-b";
-				}else{
-					if(i < this.height - 1){
-						cor += " border-b";
-					}else{
-						if(j < this.width - 1){
-							cor += " border-r";
+			wrapper: null,
+			block: null,
+
+			selected: null,
+			pseudo_dragging: null,
+
+			init: function(selector){
+
+				// Получаем враппер
+				this.wrapper = document.querySelector(selector);
+				this.wrapper.style.width = this.size_item*this.width;
+				this.wrapper.style.height = this.size_item*this.height;
+
+
+				// Создаём контейнер с картой
+				this.block = document.createElement('div');
+				this.block.setAttribute('class', 'map_div');
+
+				this.block.style.width = this.size_item*this.width;
+				this.block.style.height = this.size_item*this.height;
+
+
+				for(let i = 0; i < this.height; i++){
+
+					this.items[i] = [];
+
+					for(let j = 0; j < this.width; j++){
+
+						let item = document.createElement('div');
+
+						// Коррекция для границ
+						let cor = "";
+
+						if((i < this.height - 1) && (j < this.width - 1)){
+							cor += " border-r-b";
+						}else{
+							if(i < this.height - 1){
+								cor += " border-b";
+							}else{
+								if(j < this.width - 1){
+									cor += " border-r";
+								}
+							}
 						}
-					}
-				}
 
-				item.setAttribute("class", "map_item" + cor);
+						item.setAttribute("class", "map_item" + cor);
 
-				item.style.top = this.size_item*i + "px";
-				item.style.left = this.size_item*j + "px";
+						item.style.top = this.size_item*i + "px";
+						item.style.left = this.size_item*j + "px";
 
-				item.style.width = this.size_item + "px";
-				item.style.height = this.size_item + "px";
+						item.style.width = this.size_item + "px";
+						item.style.height = this.size_item + "px";
 
 
-				// Добавляем данные о координатах
-				item.x = i;
-				item.y = j;
+						// Добавляем данные о координатах
+						item.x = i;
+						item.y = j;
 
-				item.zone = null;
+						item.zone = null;
 
 
 
-				// Добавление событий
-				item.addEventListener('click', function(){
-					//item.classList.toggle("filled");
+						// Добавление событий
+						item.addEventListener('click', function(){
+							//item.classList.toggle("filled");
 
-					if(map.selected){
+							if(map.selected){
 
-						item.innerHTML = "";
+								item.innerHTML = "";
 
-            let sh = map.selected;
+					let sh = map.selected;
 
-						//map.selected = null;
+								//map.selected = null;
 
-						var sh_item = document.createElement('div');
-						sh_item.setAttribute("class", "map_shelfs_item");
+								var sh_item = document.createElement('div');
+								sh_item.setAttribute("class", "map_shelfs_item");
 
-						sh_item.classList.add("type_" + sh.type);
+								sh_item.classList.add("type_" + sh.type);
 
-						// !!!!!!!!!!!! Этот объект хранит в себе список списков:
-						// 1 - список полок,
-						// 2 - список продуктов на каждой полке
-						sh_item.shelfs = [];	//Список полок, изначально пустой
+								// !!!!!!!!!!!! Этот объект хранит в себе список списков:
+								// 1 - список полок,
+								// 2 - список продуктов на каждой полке
+								sh_item.shelfs = [];	//Список полок, изначально пустой
 
 
-						sh_item.style.width = parseInt(item.style.width) - 3;
-						sh_item.style.height = parseInt(item.style.height) - 3;
+								sh_item.style.width = parseInt(item.style.width) - 3;
+								sh_item.style.height = parseInt(item.style.height) - 3;
 
-						sh_item.style.marginTop = 2 + "px";
-						sh_item.style.marginLeft = 2 + "px";
+								sh_item.style.marginTop = 2 + "px";
+								sh_item.style.marginLeft = 2 + "px";
 
-						var close = document.createElement('div');
+								var close = document.createElement('div');
 
-						close.classList.add("close");
+								close.classList.add("close");
 
-						close.style.width = 10 + "px";
-						close.style.height = 10 + "px";
-						close.style.position = "absolute";
-						close.style.top = -2 + "px";
-						close.style.right = -2 + "px";
+								close.style.width = 10 + "px";
+								close.style.height = 10 + "px";
+								close.style.position = "absolute";
+								close.style.top = -2 + "px";
+								close.style.right = -2 + "px";
 
-						close.addEventListener('click', function(e){
-							e.stopPropagation();
-							map.selected = null;
-							item.innerHTML = "";
+								close.addEventListener('click', function(e){
+									e.stopPropagation();
+									map.selected = null;
+									item.innerHTML = "";
 
-              // Добавление действия
-              list_doing.push(new Change("removeEntity", {
-	              projectId: map.id,
-	              x: item.x,
-	              y: item.y,
-              }));
+					// Добавление действия
+					list_doing.push(new Change("removeEntity", {
+						projectId: map.id,
+						x: item.x,
+						y: item.y,
+					}));
+
+								});
+
+
+								// Навешиваем событие на наш элемент в ячейке
+								// ------------------------------------------------------------------------
+								sh_item.addEventListener('click', function(e){
+
+									// Первые три типа - полки, они редактируемые, остальные - нет
+									if(sh.type > 2)
+										return;
+
+									e.stopPropagation();
+
+									// Убираем лишнее
+									if(map.pseudo_dragging)
+										map.pseudo_dragging.remove();
+
+									map.pseudo_dragging = null;
+									map.selected = null;
+
+									map.relate_products(item, e);
+
+								});
+
+
+								// Добавление действия
+					list_doing.push(new Change("addEntity", {
+					projectId: map.id,
+					x: item.x,
+						y: item.y,
+					w: 1,
+					h: 1,
+					d: 1,
+					contents: null,
+					group: item.zone
+					}));
+
+
+
+								sh_item.append(close);
+
+								item.append(sh_item);
+
+								item.contain = sh_item;
+
+
+
+								//item.append(map.selected);
+
+								console.log("yes");
+							}else{
+								console.log("no");
+							}
 
 						});
 
 
-						// Навешиваем событие на наш элемент в ячейке
-						// ------------------------------------------------------------------------
-						sh_item.addEventListener('click', function(e){
+						// ВЫДЕДЕНИЕ ПОЛЯ !!!!!!!!!!!!!!!!!!!!!!
+						item.addEventListener('mousedown', function(){
 
-							// Первые три типа - полки, они редактируемые, остальные - нет
-							if(sh.type > 2)
-								return;
+							if(cursor.allotment.doing){
+								cursor.allotment.start_item = item;
+							}
 
-							e.stopPropagation();
+						});
+						item.addEventListener('mouseup', function(){
 
-							// Убираем лишнее
-							if(map.pseudo_dragging)
-								map.pseudo_dragging.remove();
-
-							map.pseudo_dragging = null;
-							map.selected = null;
-
-							map.relate_products(item, e);
+							if(cursor.allotment.doing){
+								cursor.allotment.finish_item = item;
+							}
 
 						});
 
+						this.items[i][j] = item;
 
-						// Добавление действия
-            list_doing.push(new Change("addEntity", {
-              projectId: map.id,
-              x: item.x,
-            	y: item.y,
-              w: 1,
-              h: 1,
-              d: 1,
-              contents: null,
-              group: item.zone
-          	}));
+						this.block.append(item);
 
-
-
-						sh_item.append(close);
-
-						item.append(sh_item);
-
-						item.contain = sh_item;
-
-
-
-						//item.append(map.selected);
-
-						console.log("yes");
-					}else{
-						console.log("no");
 					}
 
-				});
+				}
 
 
-				// ВЫДЕДЕНИЕ ПОЛЯ !!!!!!!!!!!!!!!!!!!!!!
-				item.addEventListener('mousedown', function(){
+				this.wrapper.append(this.block);
 
-					if(cursor.allotment.doing){
-						cursor.allotment.start_item = item;
+			},
+
+			relate_products: function(item, e){
+
+				var rel = document.querySelector("#relate_products_wrapper");
+
+				rel.innerHTML = "";
+
+				rel.style.left = (e.pageX + 10) + "px";
+				rel.style.top = 50 + "px";
+
+				rel.style.display = "block";
+
+				var sh = item.contain;
+
+				//console.log(sh);
+
+				var mw = 0;
+				var mh = 0;
+				var md = 0;
+
+				//console.log(sh.shelfs);
+
+				for(let i = 0; i < sh.shelfs.length; i++){
+
+					var obj = sh.shelfs[i];
+					var cheir = document.createElement('div');
+
+					mw += obj.w;
+					mh += obj.h;
+					md += obj.d;
+
+					cheir.setAttribute("class", "cheir");
+
+
+					cheir.innerHTML = "Полка "+(i+1);
+
+					cheir.addEventListener('click', function(e){
+						var par = obj;
+						console.log(par);
+					});
+					//console.log(cheir);
+					rel.append(cheir);
+
+				}
+
+				var add_cheir = document.createElement('div');
+				add_cheir.setAttribute("class", "add_cheir");
+
+				add_cheir.innerHTML = "Добавить полку";
+
+				add_cheir.addEventListener('click', function(){
+
+					var cheir = document.createElement('div');
+
+					cheir.setAttribute("class", "cheir");
+
+
+					cheir.innerHTML = "Полка "+(sh.shelfs.length + 1);
+
+					cheir.addEventListener('click', function(e){
+						var par = cheir;
+
+						var div_products = document.querySelector("#products");
+
+					});
+
+
+					var f = document.querySelector("#ask_g");
+
+					alert("Введите габариты полки в поля формы в сантиметрах\nДопустимые размеры: ширина = "+(100 - mw)+"cm\nвысота = "+(250 - mh)+"cm\nглубина = "+(50 - md)+"cm");
+
+					f.style.display = "block";
+
+					var w = 1;
+					var h = 1;
+					var d = 1;
+
+
+					document.querySelector("#ask_g_but").addEventListener('click', function(){
+
+						w = document.querySelector("#ask_g_w").value*1;
+						h = document.querySelector("#ask_g_h").value*1;
+						d = document.querySelector("#ask_g_d").value*1;
+
+						if(!w || !h || !d){
+							//alert("Неверный формат данных о полке");
+							//return;
+						}
+
+						if((mw+w > 100) || (mh+h > 250) || (md+d > 50)){
+							alert("Превышены возможные габариты полки");
+							return;
+						}
+
+						sh.shelfs.push({
+							pr: [],
+							w: w,
+							h: h,
+							d: d
+						});
+
+						mw += w;
+						mh += h;
+						md += d;
+
+						//console.log(sh.shelfs[sh.shelfs.length-1]);
+
+						console.log(sh.shelfs);
+						rel.insertBefore(cheir, add_cheir);
+
+						f.style.display = "none";
+						f.reset();
+
+					});
+					/*
+					sh.shelfs.push({
+						pr: [],
+						w: w,
+						h: h,
+						d: d
+					});
+
+					rel.insertBefore(cheir, add_cheir);
+					map.params_for_add_product = {
+						mass: sh.shelfs,
+						form: f,
+						rel: rel,
+						cheir:cheir,
+						add_cheir:add_cheir
 					}
 
-				});
-				item.addEventListener('mouseup', function(){
-
-					if(cursor.allotment.doing){
-						cursor.allotment.finish_item = item;
-					}
-
+					*/
 				});
 
-				this.items[i][j] = item;
+				rel.append(add_cheir);
 
-				this.block.append(item);
+
 
 			}
+
+
 
 		}
 
 
-		this.wrapper.append(this.block);
-
-	},
-
-	relate_products: function(item, e){
-
-		var rel = document.querySelector("#relate_products_wrapper");
-
-		rel.innerHTML = "";
-
-		rel.style.left = (e.pageX + 10) + "px";
-		rel.style.top = 50 + "px";
-
-		rel.style.display = "block";
-
-		var sh = item.contain;
-
-		//console.log(sh);
-
-		var mw = 0;
-		var mh = 0;
-		var md = 0;
-
-		//console.log(sh.shelfs);
-
-		for(let i = 0; i < sh.shelfs.length; i++){
-
-			var obj = sh.shelfs[i];
-			var cheir = document.createElement('div');
-
-			mw += obj.w;
-			mh += obj.h;
-			md += obj.d;
-
-			cheir.setAttribute("class", "cheir");
+		map.init("#map_wrapper");
 
 
-			cheir.innerHTML = "Полка "+(i+1);
 
-			cheir.addEventListener('click', function(e){
-				var par = obj;
-				console.log(par);
-			});
-			//console.log(cheir);
-			rel.append(cheir);
+
+
+
+
+
+		// Объекты (dom) --------------------------------------------------------
+
+		pool = {
+
+			size: 0,
+
+			items: null,
+			size_item: 20,
+
+			wrapper: null,
+			block: null,
+
+			init: function(selector){
+
+
+				// Получаем враппер
+				this.wrapper = document.querySelector(selector);
+				this.wrapper.style.width = this.size_item*4 + 4*2 + 4*10;
+				this.wrapper.style.height = this.size_item*2 + 2*2 + 2*10;
+
+
+				// Создаём контейнер с картой
+				this.block = document.createElement('div');
+				this.block.setAttribute('class', 'shelfs_div');
+
+				this.block.style.width = this.size_item*4 + 4*2 + 4*10;
+				this.block.style.height = this.size_item*2 + 2*2 + 2*10;
+
+				for(let i = 0; i < 8; i++){
+
+					let item = document.createElement('div');
+					item.setAttribute("class", "shelfs_item_"+i);
+
+					item.style.width = this.size_item + "px";
+					item.style.height = this.size_item + "px";
+
+					item.setAttribute("class", "shelfs_item");
+
+					// Добавляем ещё классов
+					item.classList.add("shelfs_item_type_"+i);
+
+
+					item.type = i;
+
+					// Добавляем события
+					item.addEventListener('click', function(){
+						map.selected = item;
+					});
+
+					this.block.append(item);
+
+				}
+
+				this.wrapper.append(this.block);
+
+
+			}
+
 
 		}
 
-		var add_cheir = document.createElement('div');
-		add_cheir.setAttribute("class", "add_cheir");
-
-		add_cheir.innerHTML = "Добавить полку";
-
-		add_cheir.addEventListener('click', function(){
-
-			var cheir = document.createElement('div');
-
-			cheir.setAttribute("class", "cheir");
+		pool.init("#shelfs_wrapper");
 
 
-			cheir.innerHTML = "Полка "+(sh.shelfs.length + 1);
-
-			cheir.addEventListener('click', function(e){
-				var par = cheir;
-
-				var div_products = document.querySelector("#products");
-
-			});
 
 
-			var f = document.querySelector("#ask_g");
+		// Псевдоперетаскивание
+		// Выделение поля
+		window.addEventListener('mousemove', function(e){
 
-			alert("Введите габариты полки в поля формы в сантиметрах\nДопустимые размеры: ширина = "+(100 - mw)+"cm\nвысота = "+(250 - mh)+"cm\nглубина = "+(50 - md)+"cm");
+			if(map.pseudo_dragging)
+				map.pseudo_dragging.remove();
 
-			f.style.display = "block";
+			if(map.selected){
 
-			var w = 1;
-			var h = 1;
-			var d = 1;
+				map.pseudo_dragging = map.selected.cloneNode(true);
 
+				document.body.append(map.pseudo_dragging);
 
-			document.querySelector("#ask_g_but").addEventListener('click', function(){
+				map.pseudo_dragging.style.opacity = 0.5;
 
-				w = document.querySelector("#ask_g_w").value*1;
-				h = document.querySelector("#ask_g_h").value*1;
-				d = document.querySelector("#ask_g_d").value*1;
+				map.pseudo_dragging.style.position = "absolute";
+				map.pseudo_dragging.style.left = e.pageX + 5;
+				map.pseudo_dragging.style.top = e.pageY - map.size_item;
 
-				if(!w || !h || !d){
-					//alert("Неверный формат данных о полке");
-					//return;
-				}
-
-				if((mw+w > 100) || (mh+h > 250) || (md+d > 50)){
-					alert("Превышены возможные габариты полки");
-					return;
-				}
-
-				sh.shelfs.push({
-					pr: [],
-					w: w,
-					h: h,
-					d: d
-				});
-
-				mw += w;
-				mh += h;
-				md += d;
-
-				//console.log(sh.shelfs[sh.shelfs.length-1]);
-
-				console.log(sh.shelfs);
-				rel.insertBefore(cheir, add_cheir);
-
-				f.style.display = "none";
-				f.reset();
-
-			});
-			/*
-			sh.shelfs.push({
-				pr: [],
-				w: w,
-				h: h,
-				d: d
-			});
-
-			rel.insertBefore(cheir, add_cheir);
-			map.params_for_add_product = {
-				mass: sh.shelfs,
-				form: f,
-				rel: rel,
-				cheir:cheir,
-				add_cheir:add_cheir
+			}else{
+				map.pseudo_dragging = null;
 			}
 
-			*/
+
+
+			//Выделение поля !!!
+
+			if(cursor.allotment.doing){
+
+			if(cursor.allotment.block && cursor.pointer){
+				cursor.allotment.block.remove();
+			}
+
+			if(!cursor.pointer)
+				return;
+
+
+			e.preventDefault();
+
+			cursor.allotment.block = document.createElement('div');
+
+			cursor.allotment.block.setAttribute("class", "allotment");
+
+			cursor.allotment.x2 = e.pageX;
+			cursor.allotment.y2 = e.pageY;
+
+			cursor.allotment.block.style.width = (cursor.allotment.x2 - cursor.allotment.x1) + "px";
+			cursor.allotment.block.style.height = (cursor.allotment.y2 - cursor.allotment.y1) + "px";
+
+			cursor.allotment.block.style.left = cursor.allotment.x1;
+			cursor.allotment.block.style.top = cursor.allotment.y1;
+
+			document.body.append(cursor.allotment.block);
+
+			}
+
+
+
 		});
 
-		rel.append(add_cheir);
+		// Отключение выделения элемента
+		window.addEventListener('contextmenu', function(e){
+
+			e.preventDefault();
+
+			if(map.pseudo_dragging)
+				map.pseudo_dragging.remove();
+
+			if(e.which == 3){
+				map.selected = null;
+				map.pseudo_dragging = null;
+			}
+
+			document.querySelector("#relate_products_wrapper").style.display = "none";
+			document.querySelector("#ask_g").style.display = "none";
+
+
+		});
 
 
 
-	}
+		// Пусть пока будет
+		cursor = {
 
+			pointer: false,
 
+			allotment: {
 
-}
+				doing: false,
 
+				block: null,
+				x1: null,
+				y1: null,
+				x2: null,
+				y3: null,
+				start_item: null,
+				finish_item: null,
 
-map.init("#map_wrapper");
+				zone: 0,
 
+				done: function(e){
 
+					//console.log(this.start_item.x + " " + this.start_item.y);
+					//console.log(this.finish_item.x + " " + this.finish_item.y);
+					if(this.start_item == null || this.finish_item == null || !this.start_item.classList.contains("map_item") || !this.finish_item.classList.contains("map_item")){
+						console.log("incorrect allotment");
+						return;
+					}
 
+					var i1 = this.start_item.x;
+					var i2 = this.finish_item.x;
 
+					var j1 = this.start_item.y;
+					var j2 = this.finish_item.y;
 
+					for(let i = i1; i <= i2; i++){
 
+						for(let j = j1; j <= j2; j++){
 
+							map.items[i][j].classList.remove("zone0");
+							map.items[i][j].classList.remove("zone1");
+							map.items[i][j].classList.remove("zone2");
+							map.items[i][j].classList.remove("zone3");
 
-// Объекты (dom) --------------------------------------------------------
+							map.items[i][j].classList.add("zone"+this.zone);
+							map.items[i][j].zone = this.zone;
 
-pool = {
+						}
 
-	size: 0,
+					}
 
-	items: null,
-	size_item: 20,
+				}
 
-	wrapper: null,
-	block: null,
-
-	init: function(selector){
-
-
-		// Получаем враппер
-		this.wrapper = document.querySelector(selector);
-		this.wrapper.style.width = this.size_item*4 + 4*2 + 4*10;
-		this.wrapper.style.height = this.size_item*2 + 2*2 + 2*10;
-
-
-		// Создаём контейнер с картой
-		this.block = document.createElement('div');
-		this.block.setAttribute('class', 'shelfs_div');
-
-		this.block.style.width = this.size_item*4 + 4*2 + 4*10;
-		this.block.style.height = this.size_item*2 + 2*2 + 2*10;
-
-		for(let i = 0; i < 8; i++){
-
-			let item = document.createElement('div');
-			item.setAttribute("class", "shelfs_item_"+i);
-
-			item.style.width = this.size_item + "px";
-			item.style.height = this.size_item + "px";
-
-			item.setAttribute("class", "shelfs_item");
-
-			// Добавляем ещё классов
-			item.classList.add("shelfs_item_type_"+i);
-
-
-			item.type = i;
-
-			// Добавляем события
-			item.addEventListener('click', function(){
-				map.selected = item;
-			});
-
-			this.block.append(item);
+			}
 
 		}
 
-		this.wrapper.append(this.block);
+
+		// Делаем ВЫДЕЛЕНИЕ ЧАСТИ ПОЛЯ
+
+		window.addEventListener('mousedown', function(e){
+
+			if(cursor.allotment.doing){
+
+			if(map.selected)
+				return;
 
 
-	}
+			// При нажатии правой кнопки отменяем выделение
+			if(e.which == 3){
+				if(cursor.allotment.block){
+					cursor.allotment.block.remove();
+				}
 
-
-}
-
-pool.init("#shelfs_wrapper");
-
-
-
-
-// Псевдоперетаскивание
-// Выделение поля
-window.addEventListener('mousemove', function(e){
-
-	if(map.pseudo_dragging)
-		map.pseudo_dragging.remove();
-
-	if(map.selected){
-
-		map.pseudo_dragging = map.selected.cloneNode(true);
-
-		document.body.append(map.pseudo_dragging);
-
-		map.pseudo_dragging.style.opacity = 0.5;
-
-		map.pseudo_dragging.style.position = "absolute";
-		map.pseudo_dragging.style.left = e.pageX + 5;
-		map.pseudo_dragging.style.top = e.pageY - map.size_item;
-
-	}else{
-		map.pseudo_dragging = null;
-	}
-
-
-
-	//Выделение поля !!!
-
-	if(cursor.allotment.doing){
-
-	if(cursor.allotment.block && cursor.pointer){
-		cursor.allotment.block.remove();
-	}
-
-	if(!cursor.pointer)
-		return;
-
-
-	e.preventDefault();
-
-	cursor.allotment.block = document.createElement('div');
-
-	cursor.allotment.block.setAttribute("class", "allotment");
-
-	cursor.allotment.x2 = e.pageX;
-	cursor.allotment.y2 = e.pageY;
-
-	cursor.allotment.block.style.width = (cursor.allotment.x2 - cursor.allotment.x1) + "px";
-	cursor.allotment.block.style.height = (cursor.allotment.y2 - cursor.allotment.y1) + "px";
-
-	cursor.allotment.block.style.left = cursor.allotment.x1;
-	cursor.allotment.block.style.top = cursor.allotment.y1;
-
-	document.body.append(cursor.allotment.block);
-
-	}
-
-
-
-});
-
-// Отключение выделения элемента
-window.addEventListener('contextmenu', function(e){
-
-	e.preventDefault();
-
-	if(map.pseudo_dragging)
-		map.pseudo_dragging.remove();
-
-	if(e.which == 3){
-		map.selected = null;
-		map.pseudo_dragging = null;
-	}
-
-	document.querySelector("#relate_products_wrapper").style.display = "none";
-	document.querySelector("#ask_g").style.display = "none";
-
-
-});
-
-
-
-// Пусть пока будет
-cursor = {
-
-	pointer: false,
-
-	allotment: {
-
-		doing: false,
-
-		block: null,
-		x1: null,
-		y1: null,
-		x2: null,
-		y3: null,
-		start_item: null,
-		finish_item: null,
-
-		zone: 0,
-
-		done: function(e){
-
-			//console.log(this.start_item.x + " " + this.start_item.y);
-			//console.log(this.finish_item.x + " " + this.finish_item.y);
-			if(this.start_item == null || this.finish_item == null || !this.start_item.classList.contains("map_item") || !this.finish_item.classList.contains("map_item")){
-				console.log("incorrect allotment");
+				cursor.pointer = false;
+				cursor.allotment.x1 = null;
+				cursor.allotment.y1 = null;
 				return;
 			}
 
-			var i1 = this.start_item.x;
-			var i2 = this.finish_item.x;
 
-			var j1 = this.start_item.y;
-			var j2 = this.finish_item.y;
-
-			for(let i = i1; i <= i2; i++){
-
-				for(let j = j1; j <= j2; j++){
-
-                    map.items[i][j].classList.remove("zone0");
-                    map.items[i][j].classList.remove("zone1");
-                    map.items[i][j].classList.remove("zone2");
-                    map.items[i][j].classList.remove("zone3");
-
-					map.items[i][j].classList.add("zone"+this.zone);
-					map.items[i][j].zone = this.zone;
-
-				}
+			cursor.pointer = true;
+			//cursor.allotment.start_item = e.target;
+			cursor.allotment.x1 = e.pageX;
+			cursor.allotment.y1 = e.pageY;
 
 			}
+		});
+
+		window.addEventListener('mouseup', function(e){
+
+			if(cursor.allotment.doing){
+				cursor.pointer = false;
+
+				//cursor.allotment.finish_item = e.target;
+
+				// Применяем выделение
+				cursor.allotment.done();
+
+				cursor.allotment.x1 = null;
+				cursor.allotment.y1 = null;
+			}
+
+		});
+
+
+
+
+		function do_allotment(n = -1){
+
+
+			if(n == -1){
+
+				var doc = document.querySelector("#do_allotment");
+
+				if(doc.checked){
+					map.selected = null;
+					cursor.allotment.doing = true;
+				}else{
+					cursor.allotment.doing = false;
+				}
+				return;
+			}
+
+			cursor.allotment.zone = n*1;
 
 		}
 
-	}
+		</script>
 
-}
+		<input type="checkbox" onchange="do_allotment()" id="do_allotment">
 
-
-// Делаем ВЫДЕЛЕНИЕ ЧАСТИ ПОЛЯ
-
-window.addEventListener('mousedown', function(e){
-
-	if(cursor.allotment.doing){
-
-	if(map.selected)
-		return;
-
-
-	// При нажатии правой кнопки отменяем выделение
-	if(e.which == 3){
-		if(cursor.allotment.block){
-			cursor.allotment.block.remove();
-		}
-
-		cursor.pointer = false;
-		cursor.allotment.x1 = null;
-		cursor.allotment.y1 = null;
-		return;
-	}
-
-
-	cursor.pointer = true;
-	//cursor.allotment.start_item = e.target;
-	cursor.allotment.x1 = e.pageX;
-	cursor.allotment.y1 = e.pageY;
-
-	}
-});
-
-window.addEventListener('mouseup', function(e){
-
-	if(cursor.allotment.doing){
-		cursor.pointer = false;
-
-		//cursor.allotment.finish_item = e.target;
-
-		// Применяем выделение
-		cursor.allotment.done();
-
-		cursor.allotment.x1 = null;
-		cursor.allotment.y1 = null;
-	}
-
-});
-
-
-
-
-function do_allotment(n = -1){
-
-
-	if(n == -1){
-
-        var doc = document.querySelector("#do_allotment");
-
-        if(doc.checked){
-            map.selected = null;
-            cursor.allotment.doing = true;
-        }else{
-            cursor.allotment.doing = false;
-        }
-        return;
-	}
-
-	cursor.allotment.zone = n*1;
-
-}
-
-</script>
-
-<input type="checkbox" onchange="do_allotment()" id="do_allotment">
-
-<div name="zones">
-	<div value="0" onclick="do_allotment(0)">Зона максимум</div>
-	<div value="1" onclick="do_allotment(1)">Зона более</div>
-	<div value="2" onclick="do_allotment(2)">Зона нормально</div>
-	<div value="3" onclick="do_allotment(3)">Обычная зона</div>
-</div>
+		<div name="zones">
+			<div value="0" onclick="do_allotment(0)">Зона максимум</div>
+			<div value="1" onclick="do_allotment(1)">Зона более</div>
+			<div value="2" onclick="do_allotment(2)">Зона нормально</div>
+			<div value="3" onclick="do_allotment(3)">Обычная зона</div>
+		</div>
+	</div>
+</body>
