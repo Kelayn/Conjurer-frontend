@@ -1,6 +1,6 @@
 <style>
 
-.map_div{
+	.map_div{
 	position: relative;
 }
 
@@ -224,28 +224,28 @@
 }
 </style>
 
-<div id = "map_wrapper"></div>
+<div id="map_wrapper"></div>
 
-<div id = "shelfs_wrapper"></div>
+<div id="shelfs_wrapper"></div>
 
-<div id = "relate_products_wrapper"></div>
+<div id="relate_products_wrapper"></div>
 
 
-<form id = "ask_g">
-	<input id = "ask_g_h" placeholder = "Длина полки"><br>
-	<input id = "ask_g_w" placeholder = "Ширина полки"><br>
-	<input id = "ask_g_d" placeholder = "Глубина полки"><br>
-	<div id = "ask_g_but">Добавить полку!</div>
+<form id="ask_g">
+	<input id="ask_g_h" placeholder="Длина полки"><br>
+	<input id="ask_g_w" placeholder="Ширина полки"><br>
+	<input id="ask_g_d" placeholder="Глубина полки"><br>
+	<div id="ask_g_but">Добавить полку!</div>
 </form>
 
 
-<div id = "products">
+<div id="products">
 
 	<select>
-		<option value = "1">Молоко</option>
-		<option value = "2">Мясо</option>
-		<option value = "3">Винцо</option>
-		<option value = "4">Хлеб</option>
+		<option value="1">Молоко</option>
+		<option value="2">Мясо</option>
+		<option value="3">Винцо</option>
+		<option value="4">Хлеб</option>
 	</select>
 
 </div>
@@ -269,7 +269,7 @@
 -->
 <script>
 
-//Mouse pos
+	//Mouse pos
 /*
 document.querySelector("#click").addEventListener('click', function(e){
 	var add = document.querySelector("#addItems");
@@ -284,7 +284,7 @@ document.querySelector("#click").addEventListener('click', function(e){
 
 <script>
 
-// Лист изменений
+	// Лист изменений
 list_doing = [];
 
 function Change(type, params){
@@ -320,7 +320,7 @@ map = {
 	width: 30,
 	height: 10,
 
-	size_item: 22,
+	size_item: 48,
 
 	items: [],
 
@@ -707,7 +707,7 @@ pool = {
 		for(let i = 0; i < 8; i++){
 
 			let item = document.createElement('div');
-			<!-- item.setAttribute("class", "shelfs_item_"+i); -->
+			item.setAttribute("class", "shelfs_item_"+i);
 
 			item.style.width = this.size_item + "px";
 			item.style.height = this.size_item + "px";
@@ -950,23 +950,13 @@ function do_allotment(n = -1){
 
 }
 
-
-
-
-
-
 </script>
 
+<input type="checkbox" onchange="do_allotment()" id="do_allotment">
 
-
-
-
-
-<input type = "checkbox" onchange = "do_allotment()" id = "do_allotment">
-
-<div name = "zones">
-	<div value = "0" onclick = "do_allotment(0)">Зона максимум</div>
-	<div value = "1" onclick = "do_allotment(1)">Зона более</div>
-	<div value = "2" onclick = "do_allotment(2)">Зона нормально</div>
-	<div value = "3" onclick = "do_allotment(3)">Обычная зона</div>
+<div name="zones">
+	<div value="0" onclick="do_allotment(0)">Зона максимум</div>
+	<div value="1" onclick="do_allotment(1)">Зона более</div>
+	<div value="2" onclick="do_allotment(2)">Зона нормально</div>
+	<div value="3" onclick="do_allotment(3)">Обычная зона</div>
 </div>
