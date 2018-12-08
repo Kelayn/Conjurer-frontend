@@ -112,20 +112,25 @@
 	display: none;
 }
 .shelfs_item_type_3,.type_3{
-	background: url("https://pp.userapi.com/c847218/v847218075/146e4d/AfL0Lfhg8NY.jpg");
+	background: url("https://pp.userapi.com/c850016/v850016075/ceaff/eXyqsIrb0F4.jpg");
 	background-size:cover;
 }
 .shelfs_item_type_4,.type_4{
-	background-color: #468;
+	background: url("https://pp.userapi.com/c851016/v851016575/62329/iWTTFA18yaQ.jpg");
+	background-size:cover;
 }
 .shelfs_item_type_5,.type_5{
-	background-color: #579;
+	background: url("https://pp.userapi.com/c852320/v852320575/607fb/70jNc5IeFV0.jpg");
+	background-size:cover;
 }
+
 .shelfs_item_type_6,.type_6{
-	background-color: #680;
+	background-color: #cccccc;
+
 }
 .shelfs_item_type_7,.type_7{
-	background-color: #ff0000;
+	background-color: #ccc;
+	display: none;
 }
 
 /* Стили зон */
@@ -163,6 +168,19 @@
 	box-shadow: 0 0 15px #ccc;
 
 	display: none;
+}
+
+
+#auto_com{
+	margin: 20px;
+	padding: 10px;
+	border-radius: 10px;
+	color: #fff;
+	background-color: ee7b13;
+	width: 150px;
+	text-align: center;
+	font-family: Arial;
+	cursor: pointer;
 }
 
 
@@ -220,6 +238,12 @@
 }
 
 #products{
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	background-color: #fff;
+	box-shadow: 0 0 15px #ccc;
+	padding: 5px;
 	display: none;
 }
 </style>
@@ -958,14 +982,14 @@ function do_allotment(n = -1){
 </script>
 
 
-
+<div id = "auto_com">Автозаполнение</div>
 
 
 
 <input type = "checkbox" onchange = "do_allotment()" id = "do_allotment">
 
 <div name = "zones">
-	<div value = "0" onclick = "do_allotment(0)">Зона максимум</div>
+	<div value = "0" onclick = "do_allotment(0)">Зона mаксимум</div>
 	<div value = "1" onclick = "do_allotment(1)">Зона более</div>
 	<div value = "2" onclick = "do_allotment(2)">Зона нормально</div>
 	<div value = "3" onclick = "do_allotment(3)">Обычная зона</div>
