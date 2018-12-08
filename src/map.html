@@ -146,6 +146,78 @@
 }
 
 
+
+#relate_products_wrapper{
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-intex: 101;
+	width: 200px;
+	min-height: 20px;
+	background-color: #fff;
+	border: 1px solid #ccc;
+	box-shadow: 0 0 15px #ccc;
+
+	display: none;
+}
+
+
+.cheir{
+	width: 98%;
+	margin: 2px 1%;
+	height: 30px;
+	font-size: 15px;
+	color: #343434;
+
+	cursor: pointer;
+	transition: background-color 0.5s;
+}
+.cheir:hover{
+	background-color:#efefef;
+}
+
+
+.add_cheir{
+	text-align: center;
+	width: 98%;
+	margin: 5px 1%;
+	padding: 2px 0;
+	background-color: #050;
+	color: #fff;
+	font-size: 12px;
+	font-family: Arial;
+	color: #fff;
+	cursor: pointer;
+
+	transition: background-color 0.2s;
+}
+
+.add_cheir:hover{
+	background-color: #383;
+}
+
+#ask_g{
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	background-color: #fff;
+	display: none;
+}
+
+#ask_g_but{
+	width: 98%;
+	margin: 5px 1%;
+	background-color: #357;
+	color: #fff;
+	font-family: Arial;
+	font-size: 12px;
+	padding: 3px 0;
+	text-align: center;
+}
+
+#products{
+	display: none;
+}
 </style>
 
 <div id = "map_wrapper"></div>
@@ -154,6 +226,27 @@
 
 <div id = "relate_products_wrapper"></div>
 
+
+<form id = "ask_g">
+	<input id = "ask_g_h" placeholder = "Длина полки"><br>
+	<input id = "ask_g_w" placeholder = "Ширина полки"><br>
+	<input id = "ask_g_d" placeholder = "Глубина полки"><br>
+	<div id = "ask_g_but">Добавить полку!</div>
+</form>
+
+
+<div id = "products">
+
+	<select>
+		<option value = "1">Молоко</option>
+		<option value = "2">Мясо</option>
+		<option value = "3">Винцо</option>
+		<option value = "4">Хлеб</option>
+	</select>
+
+</div>
+
+<!--
 <div id="addItems">
 	<table>
 		<tr>
@@ -169,18 +262,18 @@
 		</tr>
 	</table>
 </div>
-
+-->
 <script>
 
 //Mouse pos
-
+/*
 document.querySelector("#click").addEventListener('click', function(e){
 	var add = document.querySelector("#addItems");
 	add.style.left = e.pageX + "px";
 	add.style.top = e.pageY + "px";
 
 });
-
+*/
 
 </script>
 
@@ -335,9 +428,9 @@ map = {
 
               // Добавление действия
               list_doing.push(new Change("removeEntity", {
-              projectId: map.id,
-              x: item.x,
-              y: item.y,
+	              projectId: map.id,
+	              x: item.x,
+	              y: item.y,
               }));
 
 						});
@@ -360,7 +453,7 @@ map = {
 							map.pseudo_dragging = null;
 							map.selected = null;
 
-							map.relate_products(item);
+							map.relate_products(item, e);
 
 						});
 
@@ -426,9 +519,144 @@ map = {
 
 	},
 
-	relate_products: function(){
+	relate_products: function(item, e){
 
-	};
+		var rel = document.querySelector("#relate_products_wrapper");
+
+		rel.innerHTML = "";
+
+		rel.style.left = (e.pageX + 10) + "px";
+		rel.style.top = 50 + "px";
+
+		rel.style.display = "block";
+
+		var sh = item.contain;
+
+		//console.log(sh);
+
+		var mw = 0;
+		var mh = 0;
+		var md = 0;
+
+		//console.log(sh.shelfs);
+
+		for(let i = 0; i < sh.shelfs.length; i++){
+
+			var obj = sh.shelfs[i];
+			var cheir = document.createElement('div');
+
+			mw += obj.w;
+			mh += obj.h;
+			md += obj.d;
+
+			cheir.setAttribute("class", "cheir");
+
+
+			cheir.innerHTML = "Полка "+(i+1);
+
+			cheir.addEventListener('click', function(e){
+				var par = obj;
+				console.log(par);
+			});
+			//console.log(cheir);
+			rel.append(cheir);
+
+		}
+
+		var add_cheir = document.createElement('div');
+		add_cheir.setAttribute("class", "add_cheir");
+
+		add_cheir.innerHTML = "Добавить полку";
+
+		add_cheir.addEventListener('click', function(){
+
+			var cheir = document.createElement('div');
+
+			cheir.setAttribute("class", "cheir");
+
+
+			cheir.innerHTML = "Полка "+(sh.shelfs.length + 1);
+
+			cheir.addEventListener('click', function(e){
+				var par = cheir;
+
+				var div_products = document.querySelector("#products");
+
+			});
+
+
+			var f = document.querySelector("#ask_g");
+
+			alert("Введите габариты полки в поля формы в сантиметрах\nДопустимые размеры: ширина = "+(100 - mw)+"cm\nвысота = "+(250 - mh)+"cm\nглубина = "+(50 - md)+"cm");
+
+			f.style.display = "block";
+
+			var w = 1;
+			var h = 1;
+			var d = 1;
+
+
+			document.querySelector("#ask_g_but").addEventListener('click', function(){
+
+				w = document.querySelector("#ask_g_w").value*1;
+				h = document.querySelector("#ask_g_h").value*1;
+				d = document.querySelector("#ask_g_d").value*1;
+
+				if(!w || !h || !d){
+					//alert("Неверный формат данных о полке");
+					//return;
+				}
+
+				if((mw+w > 100) || (mh+h > 250) || (md+d > 50)){
+					alert("Превышены возможные габариты полки");
+					return;
+				}
+
+				sh.shelfs.push({
+					pr: [],
+					w: w,
+					h: h,
+					d: d
+				});
+
+				mw += w;
+				mh += h;
+				md += d;
+
+				//console.log(sh.shelfs[sh.shelfs.length-1]);
+
+				console.log(sh.shelfs);
+				rel.insertBefore(cheir, add_cheir);
+
+				f.style.display = "none";
+				f.reset();
+
+			});
+			/*
+			sh.shelfs.push({
+				pr: [],
+				w: w,
+				h: h,
+				d: d
+			});
+
+			rel.insertBefore(cheir, add_cheir);
+			map.params_for_add_product = {
+				mass: sh.shelfs,
+				form: f,
+				rel: rel,
+				cheir:cheir,
+				add_cheir:add_cheir
+			}
+
+			*/
+		});
+
+		rel.append(add_cheir);
+
+
+
+	}
 
 
 
@@ -582,6 +810,8 @@ window.addEventListener('contextmenu', function(e){
 		map.selected = null;
 		map.pseudo_dragging = null;
 	}
+
+	document.querySelector("#relate_products_wrapper").style.display = "none";
 
 
 
@@ -746,5 +976,3 @@ function do_allotment(n = -1){
 	<div value = "2" onclick = "do_allotment(2)">Зона нормально</div>
 	<div value = "3" onclick = "do_allotment(3)">Обычная зона</div>
 </div>
-
-<img src = "https://trello-attachments.s3.amazonaws.com/5c02b6b3762ec67042404477/5c0967b53b74660b9e1d13af/1280x512/d064bd34906ba6012520daf85a9a21d5/interface-icon.png">
