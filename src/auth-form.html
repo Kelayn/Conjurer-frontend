@@ -71,7 +71,7 @@
                     <h6>Sign In</h6>
                   </div>
                   <div class="card-body">
-                    <form>
+                    <form id = "auth_form" action = "#">
                       <div class="input-group form-group">
                         <input type="text" class="form-control" placeholder="username" style="font-size:10pt">
                       </div>
@@ -79,7 +79,7 @@
                         <input type="password" class="form-control" placeholder="password" style="font-size:10pt">
                       </div>
                       <div class="form-group" style="margin-bottom:0px">
-                        <input type="submit" value="Login" class="btn float-right xs-login_btn" style="color:#CCC">
+                        <div value="Login" class="btn float-right xs-login_btn" id = "auth_form_but" style="color:#CCC">Login</div>
                       </div>
                     </form>
                   </div>
@@ -100,7 +100,7 @@
         </div>
       <div class="container1">
         <div id="id01" class="modal">
-          <form class="modal-content" action="/action_page.php">
+          <form id = "reg_form" class="modal-content" action="#">
             <div class="container">
               <h1>Sign Up</h1>
               <hr>
@@ -114,7 +114,7 @@
               <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
 
               <div class="clearfix">
-                <button type="submit" class="signupbtn">Sign Up</button>
+                <button type="submit" class="signupbtn" id = "reg_form_but">Sign Up</button>
                 <button type="button" onclick="document.getElementById('id01').style.display='none';$('.container1').fadeOut(500);" class="cancelbtn" style="margin-right:5px;">Cancel</button>
               </div>
             </div>
@@ -125,6 +125,60 @@
         <script>
         // Get the modal
         var modal = document.getElementById('id01');
+        
+    $(document).ready(function(){
+    
+        $("#auth_form_but").click(function(){
+            
+            var d = $("#auth_form").serialize();
+	
+            $.ajax({
+                type: 'POST',
+                url: '/login',
+                data: d,
+                success: function(data){
+                    
+                    var res = JSON.parse(data);
+                    
+                    if(res.status == 0){
+                        document.location.href = "map.html";
+                    }else{
+                        alert("Неверный логин или пароль");
+                    }
+
+                },
+                error: function(xhr,str){
+                    alert("Не получен доступ к серверу");
+                }
+            });
+        });
+        
+        
+        $("#reg_form_but").click(function(){
+            
+            var d = $("#reg_form").serialize();
+	
+            $.ajax({
+                type: 'POST',
+                url: '/register',
+                data: d,
+                success: function(data){
+                    
+                    var res = JSON.parse(data);
+                    
+                    if(res.status == 0){
+                        document.location.href = "map.html";
+                    }else{
+                        alert("Что-то не так...");
+                    }
+
+                },
+                error: function(xhr,str){
+                    alert("Не получен доступ к серверу");
+                }
+            });
+        });
+    });
         </script>
 
     </body>
