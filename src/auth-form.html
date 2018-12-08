@@ -125,21 +125,21 @@
         <script>
         // Get the modal
         var modal = document.getElementById('id01');
-        
+
     $(document).ready(function(){
-    
+
         $("#auth_form_but").click(function(){
-            
+
             var d = $("#auth_form").serialize();
-	
+
             $.ajax({
                 type: 'POST',
                 url: '/login',
                 data: d,
                 success: function(data){
-                    
+
                     var res = JSON.parse(data);
-                    
+
                     if(res.status == 0){
                         document.location.href = "map.html";
                     }else{
@@ -152,20 +152,20 @@
                 }
             });
         });
-        
-        
+
+
         $("#reg_form_but").click(function(){
-            
+
             var d = $("#reg_form").serialize();
-	
+
             $.ajax({
                 type: 'POST',
                 url: '/register',
                 data: d,
                 success: function(data){
-                    
+
                     var res = JSON.parse(data);
-                    
+
                     if(res.status == 0){
                         document.location.href = "map.html";
                     }else{
