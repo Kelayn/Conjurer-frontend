@@ -584,6 +584,11 @@ cursor = {
 			
 				for(let j = j1; j <= j2; j++){
 				
+                    map.items[i][j].classList.remove("zone0");
+                    map.items[i][j].classList.remove("zone1");
+                    map.items[i][j].classList.remove("zone2");
+                    map.items[i][j].classList.remove("zone3");
+                    
 					map.items[i][j].classList.add("zone"+this.zone);
 					map.items[i][j].zone = this.zone;
 					
