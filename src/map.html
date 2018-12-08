@@ -152,6 +152,8 @@
 
 <div id = "shelfs_wrapper"></div>
 
+<div id = "relate_products_wrapper"></div>
+
 <div id="addItems">
 	<table>
 		<tr>
@@ -331,12 +333,12 @@ map = {
 							map.selected = null;
 							item.innerHTML = "";
 
-                            // Добавление действия
-                            list_doing.push(new Change("removeEntity", {
-                                projectId: map.id,
-                                x: item.x,
-                                y: item.y,
-                            }));
+              // Добавление действия
+              list_doing.push(new Change("removeEntity", {
+              projectId: map.id,
+              x: item.x,
+              y: item.y,
+              }));
 
 						});
 
@@ -358,23 +360,22 @@ map = {
 							map.pseudo_dragging = null;
 							map.selected = null;
 
-
-							alert(sh.type);
+							map.relate_products(item);
 
 						});
 
 
 						// Добавление действия
-                        list_doing.push(new Change("addEntity", {
-                            projectId: map.id,
-                            x: item.x,
-                            y: item.y,
-                            w: 1,
-                            h: 1,
-                            d: 1,
-                            contents: null,
-                            group: item.zone
-                        }));
+            list_doing.push(new Change("addEntity", {
+              projectId: map.id,
+              x: item.x,
+            	y: item.y,
+              w: 1,
+              h: 1,
+              d: 1,
+              contents: null,
+              group: item.zone
+          	}));
 
 
 
@@ -425,6 +426,9 @@ map = {
 
 	},
 
+	relate_products: function(){
+
+	};
 
 
 
