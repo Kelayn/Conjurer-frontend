@@ -1,0 +1,643 @@
+<style>
+
+.map_div{
+	position: relative;
+}
+
+#map_wrapper{
+	padding: 4px;
+	border-radius: 2px;
+	border: 1px solid #ccc;
+	
+}
+
+.map_item{
+	position: absolute;
+	transition: background-color 0.2s;
+}
+
+.map_item:hover{
+	background-color: #efefef;
+	border-right: 1px solid #efefef;
+	border-bottom: 1px solid #efefef;
+}
+
+.border-r-b{
+	border-right: 1px solid #bbb;
+	border-bottom: 1px solid #ccc;
+}
+
+.border-b{
+	border-bottom: 1px solid #ccc;
+}
+
+.border-r{
+	border-right: 1px solid #ccc;
+}
+
+.filled{
+	background-color: #357;
+}
+
+.close{
+	background-color: #ff0000;
+	border-radius: 100%;
+	cursor: pointer;
+	transform: rotate(45deg);
+	
+	opacity: 0.1;
+	transition: opacity 0.2s;
+}
+.close:after{
+	content: "+";
+	color: #fff;
+	font-size: 10px;
+    font-weight: bold;
+    margin-left: 2px;
+    margin-top: -10px;
+}
+
+.map_shelfs_item:hover > .close{
+	opacity: 1;
+}
+
+
+
+
+.map_shelfs_item{
+	position: relative;
+	background-color: #35f;
+	display: inline-block;
+	cursor: auto;
+}
+
+
+
+#shelfs_wrapper{
+	border: 1px solid #ccc;
+	padding: 4px;
+	border-radius: 2px;
+	margin-top: 20px;
+}
+
+.shelfs_item{
+	border: 1px solid #ccc;
+	border-radius: 2px;
+	display: inline-block;
+	cursor: pointer;
+	margin: 5px;
+}
+
+
+.allotment{
+	position: absolute;
+	background-color: rgba(0,0,255,0.5);
+	border: 1px solid #00f;
+	z-index: 100;
+	
+	pointer-events: none;
+}
+
+
+.shelfs_item_type_0,.type_0{
+	background-color: #135;
+}
+.shelfs_item_type_1,.type_1{
+	background-color: #246;
+}
+.shelfs_item_type_2,.type_2{
+	background-color: #357;
+}
+.shelfs_item_type_3,.type_3{
+	background-color: #468;
+}
+.shelfs_item_type_4,.type_4{
+	background-color: #468;
+}
+.shelfs_item_type_5,.type_5{
+	background-color: #579;
+}
+.shelfs_item_type_6,.type_6{
+	background-color: #680;
+}
+.shelfs_item_type_7,.type_7{
+	background-color: #ff0000;
+}
+
+/* Стили зон */
+.zone0{
+	background-color: rgba(30, 100, 170, 0.5);
+}
+.zone1{
+	background-color: rgba(100, 30, 170, 0.5);
+}
+.zone2{
+	background-color: rgba(170, 30, 100, 0.5);
+}
+.zone3{
+	background-color: rgba(100, 170, 30, 0.5);
+}
+</style>
+
+<div id = "map_wrapper"></div>
+
+<div id = "shelfs_wrapper"></div>
+
+
+
+<script>
+
+/*
+ * map - синглтон, объекты карты для размещения стеллажей
+ * и продуктов на стеллажай
+ * pool - синглтон, пул объектов, которые могут размещаться на map
+ *
+ * map:
+ *   items: двумерный массив ячеек карты
+ *			хранит dom-элементы класса map_item,
+ *			которые хранят dom-элементы sh_item,
+ *			в которых хранится массив массивов продуктов
+*/
+
+map = {
+	
+	width: 30,
+	height: 10,
+	
+	size_item: 22,
+	
+	items: [],
+	
+	wrapper: null,
+	block: null,
+	
+	selected: null,
+	pseudo_dragging: null,
+	
+	init: function(selector){
+
+		// Получаем враппер
+		this.wrapper = document.querySelector(selector);
+		this.wrapper.style.width = this.size_item*this.width;
+		this.wrapper.style.height = this.size_item*this.height;
+		
+		
+		// Создаём контейнер с картой
+		this.block = document.createElement('div');
+		this.block.setAttribute('class', 'map_div');
+		
+		this.block.style.width = this.size_item*this.width;
+		this.block.style.height = this.size_item*this.height;
+		
+		
+		for(let i = 0; i < this.height; i++){
+		
+			this.items[i] = [];
+		
+			for(let j = 0; j < this.width; j++){
+			
+				let item = document.createElement('div');
+				
+				// Коррекция для границ
+				let cor = "";
+				
+				if((i < this.height - 1) && (j < this.width - 1)){
+					cor += " border-r-b";
+				}else{
+					if(i < this.height - 1){
+						cor += " border-b";
+					}else{
+						if(j < this.width - 1){
+							cor += " border-r";
+						}
+					}
+				}
+				
+				item.setAttribute("class", "map_item" + cor);
+				
+				item.style.top = this.size_item*i + "px";
+				item.style.left = this.size_item*j + "px";
+				
+				item.style.width = this.size_item + "px";
+				item.style.height = this.size_item + "px";
+				
+				
+				// Добавляем данные о координатах
+				item.x = i;
+				item.y = j;
+				
+				item.zone = null;
+				
+				
+				
+				// Добавление событий
+				item.addEventListener('click', function(){
+					//item.classList.toggle("filled");
+					
+					if(map.selected){
+						
+						item.innerHTML = "";
+						
+						let sh = map.selected;
+						
+						//map.selected = null;
+						
+						var sh_item = document.createElement('div');
+						sh_item.setAttribute("class", "map_shelfs_item");
+						
+						sh_item.classList.add("type_" + sh.type);
+						
+						// !!!!!!!!!!!! Этот объект хранит в себе список списков: 1 - список полок, 2 - список продуктов на каждой полке
+						sh_item.shelfs = [];	//Список полок, изначально пустой
+						
+						
+						sh_item.style.width = parseInt(item.style.width) - 3;
+						sh_item.style.height = parseInt(item.style.height) - 3;
+						
+						sh_item.style.marginTop = 2 + "px";
+						sh_item.style.marginLeft = 2 + "px";
+						
+						var close = document.createElement('div');
+						
+						close.classList.add("close");
+						
+						close.style.width = 10 + "px";
+						close.style.height = 10 + "px";
+						close.style.position = "absolute";
+						close.style.top = -2 + "px";
+						close.style.right = -2 + "px";
+						
+						close.addEventListener('click', function(e){
+							e.stopPropagation();
+							map.selected = null;
+							item.innerHTML = "";
+						});
+						
+						
+						// Навешиваем событие на наш элемент в ячейке
+						// ------------------------------------------------------------------------
+						sh_item.addEventListener('click', function(e){
+							
+							// Первые три типа - полки, они редактируемые, остальные - нет
+							if(sh.type > 2)
+								return;
+								
+							e.stopPropagation();
+							
+							// Убираем лишнее
+							if(map.pseudo_dragging)
+								map.pseudo_dragging.remove();
+								
+							map.pseudo_dragging = null;
+							map.selected = null;
+							
+							
+							alert(sh.type);
+							
+						});
+						
+						
+						
+						
+						sh_item.append(close);
+						
+						item.append(sh_item);
+						
+						item.contain = sh_item;
+						
+						
+						
+						//item.append(map.selected);
+						
+						console.log("yes");
+					}else{
+						console.log("no");
+					}
+					
+				});
+				
+				
+				// ВЫДЕДЕНИЕ ПОЛЯ !!!!!!!!!!!!!!!!!!!!!!
+				item.addEventListener('mousedown', function(){
+					
+					if(cursor.allotment.doing){
+						cursor.allotment.start_item = item;
+					}
+						
+				});
+				item.addEventListener('mouseup', function(){
+							
+					if(cursor.allotment.doing){
+						cursor.allotment.finish_item = item;
+					}
+						
+				});
+				
+				this.items[i][j] = item;
+				
+				this.block.append(item);
+			
+			}
+		
+		}
+		
+		
+		this.wrapper.append(this.block);
+	
+	},
+	
+
+	
+}
+
+
+map.init("#map_wrapper");
+
+
+
+
+
+
+
+
+// Объекты (dom) --------------------------------------------------------
+
+pool = {
+
+	size: 0,
+	
+	items: null,
+	size_item: 20,
+	
+	wrapper: null,
+	block: null,
+	
+	init: function(selector){
+	
+	
+		// Получаем враппер
+		this.wrapper = document.querySelector(selector);
+		this.wrapper.style.width = this.size_item*4 + 4*2 + 4*10;
+		this.wrapper.style.height = this.size_item*2 + 2*2 + 2*10;
+		
+		
+		// Создаём контейнер с картой
+		this.block = document.createElement('div');
+		this.block.setAttribute('class', 'shelfs_div');
+		
+		this.block.style.width = this.size_item*4 + 4*2 + 4*10;
+		this.block.style.height = this.size_item*2 + 2*2 + 2*10;
+		
+		for(let i = 0; i < 8; i++){
+			
+			let item = document.createElement('div');
+			<!-- item.setAttribute("class", "shelfs_item_"+i); -->
+			
+			item.style.width = this.size_item + "px";
+			item.style.height = this.size_item + "px";
+			
+			item.setAttribute("class", "shelfs_item");
+			
+			// Добавляем ещё классов
+			item.classList.add("shelfs_item_type_"+i);
+			
+			
+			item.type = i;
+			
+			// Добавляем события
+			item.addEventListener('click', function(){
+				map.selected = item;
+			});
+			
+			this.block.append(item);
+			
+		}
+		
+		this.wrapper.append(this.block);
+	
+	
+	}
+
+
+}
+
+pool.init("#shelfs_wrapper");
+
+
+
+
+// Псевдоперетаскивание
+// Выделение поля
+window.addEventListener('mousemove', function(e){
+	
+	if(map.pseudo_dragging)
+		map.pseudo_dragging.remove();
+	
+	if(map.selected){
+		
+		map.pseudo_dragging = map.selected.cloneNode(true);
+		
+		document.body.append(map.pseudo_dragging);
+		
+		map.pseudo_dragging.style.opacity = 0.5;
+		
+		map.pseudo_dragging.style.position = "absolute";
+		map.pseudo_dragging.style.left = e.pageX + 5;
+		map.pseudo_dragging.style.top = e.pageY - map.size_item;
+		
+	}else{
+		map.pseudo_dragging = null;
+	}
+	
+	
+	
+	//Выделение поля !!!
+	
+	if(cursor.allotment.doing){
+	
+	if(cursor.allotment.block && cursor.pointer){
+		cursor.allotment.block.remove();
+	}
+	
+	if(!cursor.pointer)
+		return;
+		
+		
+	e.preventDefault();
+	
+	cursor.allotment.block = document.createElement('div');
+	
+	cursor.allotment.block.setAttribute("class", "allotment");
+	
+	cursor.allotment.x2 = e.pageX;
+	cursor.allotment.y2 = e.pageY;
+	
+	cursor.allotment.block.style.width = (cursor.allotment.x2 - cursor.allotment.x1) + "px";
+	cursor.allotment.block.style.height = (cursor.allotment.y2 - cursor.allotment.y1) + "px";
+	
+	cursor.allotment.block.style.left = cursor.allotment.x1; 
+	cursor.allotment.block.style.top = cursor.allotment.y1; 
+	
+	document.body.append(cursor.allotment.block);
+	
+	}
+	
+	
+	
+});
+
+// Отключение выделения элемента
+window.addEventListener('contextmenu', function(e){
+	
+	e.preventDefault();
+	
+	if(map.pseudo_dragging)
+		map.pseudo_dragging.remove();
+	
+	if(e.which == 3){
+		map.selected = null;
+		map.pseudo_dragging = null;
+	}
+	
+	
+
+});
+
+
+
+// Пусть пока будет
+cursor = {
+	
+	pointer: false,
+	
+	allotment: {
+	
+		doing: false,
+		
+		block: null,
+		x1: null,
+		y1: null,
+		x2: null,
+		y3: null,
+		start_item: null,
+		finish_item: null,
+		
+		zone: 0,
+		
+		done: function(e){
+		
+			//console.log(this.start_item.x + " " + this.start_item.y);
+			//console.log(this.finish_item.x + " " + this.finish_item.y);
+			if(this.start_item == null || this.finish_item == null || !this.start_item.classList.contains("map_item") || !this.finish_item.classList.contains("map_item")){
+				console.log("incorrect allotment");
+				return;
+			}
+			
+			var i1 = this.start_item.x;
+			var i2 = this.finish_item.x;
+			
+			var j1 = this.start_item.y;
+			var j2 = this.finish_item.y;
+			
+			for(let i = i1; i <= i2; i++){
+			
+				for(let j = j1; j <= j2; j++){
+				
+					map.items[i][j].classList.add("zone"+this.zone);
+					map.items[i][j].zone = this.zone;
+					
+				}
+			
+			}
+			
+		}
+		
+	}
+
+}
+
+
+// Делаем ВЫДЕЛЕНИЕ ЧАСТИ ПОЛЯ
+
+window.addEventListener('mousedown', function(e){
+	
+	if(cursor.allotment.doing){
+	
+	if(map.selected)
+		return;
+		
+		
+	// При нажатии правой кнопки отменяем выделение
+	if(e.which == 3){
+		if(cursor.allotment.block){
+			cursor.allotment.block.remove();
+		}
+		
+		cursor.pointer = false;
+		cursor.allotment.x1 = null;
+		cursor.allotment.y1 = null;
+		return;
+	}
+	
+	
+	cursor.pointer = true;
+	//cursor.allotment.start_item = e.target;
+	cursor.allotment.x1 = e.pageX;
+	cursor.allotment.y1 = e.pageY;
+	
+	}
+});
+
+window.addEventListener('mouseup', function(e){
+	
+	if(cursor.allotment.doing){
+		cursor.pointer = false;
+		
+		//cursor.allotment.finish_item = e.target;
+		
+		// Применяем выделение
+		cursor.allotment.done();
+		
+		cursor.allotment.x1 = null;
+		cursor.allotment.y1 = null;
+	}
+	
+});
+
+
+
+
+function do_allotment(n = -1){
+
+
+	if(n == -1){
+	
+	var doc = document.querySelector("#do_allotment");
+	
+	if(doc.checked){
+		map.selected = null;
+		cursor.allotment.doing = true;
+	}else{
+		cursor.allotment.doing = false;
+	}
+	return;
+	}
+	
+	cursor.allotment.zone = n*1;
+	
+}
+</script>
+
+<input type = "checkbox" onchange = "do_allotment()" id = "do_allotment">
+
+<div name = "zones">
+	<div value = "0" onclick = "do_allotment(0)">Зона максимум</div>
+	<div value = "1" onclick = "do_allotment(1)">Зона более</div>
+	<div value = "2" onclick = "do_allotment(2)">Зона нормально</div>
+	<div value = "3" onclick = "do_allotment(3)">Обычная зона</div>
+</div>
+
+<img src = "https://trello-attachments.s3.amazonaws.com/5c02b6b3762ec67042404477/5c0967b53b74660b9e1d13af/1280x512/d064bd34906ba6012520daf85a9a21d5/interface-icon.png">
+
+
+
