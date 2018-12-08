@@ -73,10 +73,10 @@
                   <div class="card-body">
                     <form id = "auth_form" action = "#">
                       <div class="input-group form-group">
-                        <input type="text" class="form-control" placeholder="username" style="font-size:10pt">
+                        <input name="username" type="text" class="form-control" placeholder="username" style="font-size:10pt">
                       </div>
                       <div class="input-group form-group">
-                        <input type="password" class="form-control" placeholder="password" style="font-size:10pt">
+                        <input name="password" type="password" class="form-control" placeholder="password" style="font-size:10pt">
                       </div>
                       <div class="form-group" style="margin-bottom:0px">
                         <div value="Login" class="btn float-right xs-login_btn" id = "auth_form_but" style="color:#CCC">Login</div>
@@ -105,13 +105,13 @@
               <h1>Sign Up</h1>
               <hr>
               <label for="email"><b>Email</b></label>
-              <input type="text" placeholder="Enter Email" name="email" required>
+              <input type="text" placeholder="Enter Email" name="username" required>
 
               <label for="psw"><b>Password</b></label>
-              <input type="password" placeholder="Enter Password" name="psw" required>
+              <input type="password" placeholder="Enter Password" name="password" required>
 
               <label for="psw-repeat"><b>Repeat Password</b></label>
-              <input type="password" placeholder="Repeat Password" name="psw-repeat" required>
+              <input type="password" placeholder="Repeat Password" name="password-repeat" required>
 
               <div class="clearfix">
                 <button type="submit" class="signupbtn" id = "reg_form_but">Sign Up</button>
@@ -132,15 +132,15 @@
 
             var d = $("#auth_form").serialize();
 
+            console.log(d);
+
             $.ajax({
                 type: 'POST',
-                url: '/login',
+                url: 'http://localhost:8080/api/v1/login',
                 data: d,
                 success: function(data){
 
-                    var res = JSON.parse(data);
-
-                    if(res.status == 0){
+                    if(data.status == 0){
                         document.location.href = "map.html";
                     }else{
                         alert("Неверный логин или пароль");
@@ -160,16 +160,15 @@
 
             $.ajax({
                 type: 'POST',
-                url: '/register',
+                url: 'http://localhost:8080/api/v1/register',
                 data: d,
                 success: function(data){
 
-                    var res = JSON.parse(data);
-
-                    if(res.status == 0){
+                    if(data.status == 0){
                         document.location.href = "map.html";
                     }else{
                         alert("Что-то не так...");
+                        console.log(data);
                     }
 
                 },
