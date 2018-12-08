@@ -4,32 +4,33 @@ body {
     background: $bg-color;
     background-image: url("../assets/img/bg-gr-4.png");
 }
-.navbar-brand{
-  .text-primary{
-    color:#292b2c !important;
-  }
+
+.navbar-brand {
+    .text-primary {
+        color: #292b2c !important;
+    }
 }
 
-.text-primary{
-  color:#292b2c !important;
+.text-primary {
+    color: #292b2c !important;
 }
 
 .navbar {
-    width:100%;
-    background:none !important;
+    width: 100%;
+    background: none !important;
 
     @media(max-width: 34em) {
         background: black !important;
     }
 
     .navbar-toggler {
-        cursor:pointer;
-        outline:0;
+        cursor: pointer;
+        outline: 0;
     }
 
     .nav-link {
-        text-transform:uppercase;
-        font-weight:bold;
+        text-transform: uppercase;
+        font-weight: bold;
     }
 
     .nav-item {
@@ -41,8 +42,8 @@ body {
 
         .nav-link {
             @media(max-width: 34em) {
-                font-weight:normal;
-                color:#fff !important;
+                font-weight: normal;
+                color: #fff !important;
             }
         }
     }
