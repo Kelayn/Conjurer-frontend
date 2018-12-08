@@ -8,6 +8,9 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+
+	background: pink;
+  	background-image: url("../assets/img/bg-gr-4.png");
 }
 
 .global {
@@ -16,6 +19,7 @@ body {
 
 .map_div{
 	position: relative;
+	background: white;
 }
 
 #map_wrapper{
@@ -75,9 +79,6 @@ body {
 	opacity: 1;
 }
 
-
-
-
 .map_shelfs_item{
 	position: relative;
 	background-color: #35f;
@@ -92,6 +93,7 @@ body {
 	padding: 4px;
 	border-radius: 2px;
 	margin-top: 20px;
+	background: white;
 }
 
 .shelfs_item{
@@ -126,20 +128,25 @@ body {
 	display: none;
 }
 .shelfs_item_type_3,.type_3{
-	background: url("https://pp.userapi.com/c847218/v847218075/146e4d/AfL0Lfhg8NY.jpg");
+	background: url("https://pp.userapi.com/c850016/v850016075/ceaff/eXyqsIrb0F4.jpg");
 	background-size:cover;
 }
 .shelfs_item_type_4,.type_4{
-	background-color: #468;
+	background: url("https://pp.userapi.com/c851016/v851016575/62329/iWTTFA18yaQ.jpg");
+	background-size:cover;
 }
 .shelfs_item_type_5,.type_5{
-	background-color: #579;
+	background: url("https://pp.userapi.com/c852320/v852320575/607fb/70jNc5IeFV0.jpg");
+	background-size:cover;
 }
+
 .shelfs_item_type_6,.type_6{
-	background-color: #680;
+	background-color: #cccccc;
+
 }
 .shelfs_item_type_7,.type_7{
-	background-color: #ff0000;
+	background-color: #ccc;
+	display: none;
 }
 
 /* Стили зон */
@@ -177,6 +184,19 @@ body {
 	box-shadow: 0 0 15px #ccc;
 
 	display: none;
+}
+
+
+.auto_com{
+	margin: 20px;
+	padding: 10px;
+	border-radius: 10px;
+	color: #fff;
+	background-color: ee7b13;
+	width: 150px;
+	text-align: center;
+	font-family: Arial;
+	cursor: pointer;
 }
 
 
@@ -234,7 +254,19 @@ body {
 }
 
 #products{
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	background-color: #fff;
+	box-shadow: 0 0 15px #ccc;
+	padding: 5px;
 	display: none;
+}
+
+.toolbar {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 </style>
 
@@ -242,10 +274,23 @@ body {
 	<div class="global">
 		<div id="map_wrapper"></div>
 
-		<div id="shelfs_wrapper"></div>
-
 		<div id="relate_products_wrapper"></div>
 
+		<div class="toolbar">
+			<div id="shelfs_wrapper"></div>
+
+			<div class = "auto_com">Автозаполнение</div>
+			<div class = "auto_com">Сохранить</div>
+
+			<input type = "checkbox" onchange = "do_allotment()" id = "do_allotment">
+
+			<div name="zones">
+				<div value="0" onclick="do_allotment(0)">Зона максимум</div>
+				<div value="1" onclick="do_allotment(1)">Зона более</div>
+				<div value="2" onclick="do_allotment(2)">Зона нормально</div>
+				<div value="3" onclick="do_allotment(3)">Обычная зона</div>
+			</div>
+		</div>
 
 		<form id="ask_g">
 			<input id="ask_g_h" placeholder="Длина полки"><br>
@@ -639,9 +684,9 @@ body {
 							d: d
 						});
 
-						mw += w;
+						//mw += w;
 						mh += h;
-						md += d;
+						//md += d;
 
 						//console.log(sh.shelfs[sh.shelfs.length-1]);
 
@@ -709,16 +754,16 @@ body {
 
 				// Получаем враппер
 				this.wrapper = document.querySelector(selector);
-				this.wrapper.style.width = this.size_item*4 + 4*2 + 4*10;
-				this.wrapper.style.height = this.size_item*2 + 2*2 + 2*10;
+				this.wrapper.style.width = this.size_item*5 + 5*2 + 5*10;
+				this.wrapper.style.height = this.size_item*1 + 1*2 + 1*10;
 
 
 				// Создаём контейнер с картой
 				this.block = document.createElement('div');
 				this.block.setAttribute('class', 'shelfs_div');
 
-				this.block.style.width = this.size_item*4 + 4*2 + 4*10;
-				this.block.style.height = this.size_item*2 + 2*2 + 2*10;
+				this.block.style.width = this.size_item*5 + 5*2 + 5*10;
+				this.block.style.height = this.size_item*1 + 1*2 + 1*10;
 
 				for(let i = 0; i < 8; i++){
 
@@ -967,14 +1012,5 @@ body {
 		}
 
 		</script>
-
-		<input type="checkbox" onchange="do_allotment()" id="do_allotment">
-
-		<div name="zones">
-			<div value="0" onclick="do_allotment(0)">Зона максимум</div>
-			<div value="1" onclick="do_allotment(1)">Зона более</div>
-			<div value="2" onclick="do_allotment(2)">Зона нормально</div>
-			<div value="3" onclick="do_allotment(3)">Обычная зона</div>
-		</div>
 	</div>
 </body>
